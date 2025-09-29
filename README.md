@@ -1,16 +1,17 @@
 # Scorele 🎯
 
-A modern, responsive static web app for tracking your daily quiz game scores. Perfect for tracking your performance in Wordle, Wørdle, Wordle Geographic, Travle, Bandle, and other daily puzzle games.
+A modern, responsive Python Flask web application for tracking your daily quiz game scores. Perfect for tracking your performance in Wordle, Wørdle, Wordle Geographic, Travle, Bandle, and other daily puzzle games.
 
 ## Features
 
 - 📱 **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
 - 🎮 **Multi-Game Support**: Track scores for Wordle, Wørdle, Wordle Geographic, Travle, and Bandle
 - 📊 **Statistics Tracking**: View your total games, success rate, and average tries
-- 💾 **Local Storage**: All data is stored locally in your browser
+- 💾 **File-Based Storage**: All data is stored in JSON files on the server
 - ❌ **Failed Games**: Easy one-click option to record failed attempts
 - 🗑️ **Score Management**: Delete individual scores with confirmation
-- 🚀 **Azure Static Web Apps**: Ready for deployment to Azure Static Web Apps
+- 🌐 **Flask Backend**: Python Flask application with server-side logic
+- 💬 **Flash Messages**: User feedback for all actions
 
 ## How to Use
 
@@ -35,51 +36,96 @@ The app automatically calculates and displays:
 - **Travle**: Travel-themed daily puzzle
 - **Bandle**: Music-based daily game
 
-## Deployment
+## Installation and Setup
 
-This is a static web app that can be easily deployed to:
-- Azure Static Web Apps
-- GitHub Pages
-- Netlify
-- Vercel
-- Any static hosting service
+### Prerequisites
+- Python 3.7+
+- pip (Python package installer)
 
-### Azure Static Web Apps
+### Local Development
 
-The project includes a `staticwebapp.config.json` file for easy deployment to Azure Static Web Apps.
-
-## Development
-
-To run locally:
-
+1. **Clone the repository**:
 ```bash
-# Clone the repository
 git clone https://github.com/EdvinHildestad/scorele.git
 cd scorele
-
-# Start a local server
-python3 -m http.server 8000
-# or
-npx serve .
-
-# Open http://localhost:8000 in your browser
 ```
+
+2. **Install dependencies**:
+```bash
+pip install -r requirements.txt
+```
+
+3. **Run the application**:
+```bash
+python app.py
+```
+
+4. **Open your browser** and go to: `http://localhost:5000`
+
+### Deployment
+
+#### Azure Static Web Apps
+The project can be deployed to Azure as a Python web app using Azure App Service.
+
+#### Other Platforms
+- **Heroku**: Compatible with Heroku Python buildpack
+- **Digital Ocean**: Deploy as Python app
+- **AWS**: Use Elastic Beanstalk or EC2
+- **Railway**: Direct deployment support
 
 ## Technical Details
 
-- **Frontend**: Vanilla HTML, CSS, and JavaScript
-- **Storage**: Browser LocalStorage
+- **Backend**: Python Flask 2.3.3
+- **Frontend**: HTML5, CSS3, minimal JavaScript
+- **Storage**: JSON file-based storage (`scores.json`)
 - **Styling**: Modern CSS with gradients and responsive design
 - **Fonts**: Inter font family from Google Fonts
-- **Progressive Web App**: Includes manifest.json for PWA capabilities
+- **Architecture**: Server-side rendering with Flask templates
+
+## Project Structure
+
+```
+scorele/
+├── app.py                    # Main Flask application
+├── requirements.txt          # Python dependencies
+├── scores.json              # Data storage (created automatically)
+├── templates/
+│   └── index.html           # Main HTML template
+├── static/
+│   ├── styles.css           # CSS styling
+│   └── manifest.json        # PWA manifest
+└── README.md               # This file
+```
+
+## API Endpoints
+
+- `GET /` - Main application page
+- `POST /add_score` - Add a new score
+- `POST /delete_score/<index>` - Delete a score
+- `GET /api/stats` - Get statistics as JSON
 
 ## Browser Support
 
 Works in all modern browsers that support:
-- ES6+ JavaScript features
+- HTML5 form elements
 - CSS Grid and Flexbox
-- LocalStorage API
+- Basic JavaScript (minimal usage)
+
+## Data Storage
+
+Scores are stored in a `scores.json` file with the following structure:
+```json
+[
+  {
+    "game": "wordle",
+    "tries": 3,
+    "date": "2025-09-29",
+    "success": true,
+    "timestamp": "2025-09-29T12:00:00"
+  }
+]
+```
 
 ---
 
-Built with ❤️ for daily puzzle game enthusiasts!
+Built with ❤️ using Python Flask for daily puzzle game enthusiasts!
