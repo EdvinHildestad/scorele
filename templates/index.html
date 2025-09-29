@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scorele - Daily Quiz Score Tracker</title>
+    <meta name="description" content="Track your daily quiz game scores for Wordle, Wørdle, Wordle Geographic, Travle, and Bandle">
+    <meta name="keywords" content="wordle, score tracker, quiz games, daily games, travle, bandle">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#667eea">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Scorele</h1>
+            <p class="subtitle">Track your daily quiz game scores</p>
+        </header>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <main>
+            <section class="game-input">
+                <h2>Add Today's Score</h2>
+                <form method="POST" action="{{ url_for('add_score') }}" id="scoreForm">
+                    <div class="form-group">
+                        <label for="game">Game:</label>
+                        <select id="game" name="game" required>
+                            <option value="">Select a game</option>
+                            <option value="wordle">Wordle</option>
+                            <option value="worlde">Wørdle</option>
+                            <option value="wordle-geo">Wordle (Geographic)</option>
+                            <option value="travle">Travle</option>
+                            <option value="bandle">Bandle</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tries">Number of tries:</label>
+                        <input type="number" id="tries" name="tries" min="1" max="6">
+                        <div class="special-options">
+                            <button type="button" id="failedBtn" class="special-btn" onclick="submitFailedScore()">❌ Failed</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date" value="{{ today }}" required>
+                    </div>
+                    
+                    <input type="hidden" id="failed" name="failed" value="false">
+                    <button type="submit" class="submit-btn">Add Score</button>
+                </form>
+            </section>
+
+            <section class="stats-section">
+                <h2>Your Statistics</h2>
+                <div id="statsContainer">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Games</h3>
+                            <div class="stat-value">{{ stats.total_games }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Success Rate</h3>
+                            <div class="stat-value">{{ stats.success_rate }}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Average Tries</h3>
+                            <div class="stat-value">{{ stats.avg_tries }}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="history-section">
+                <h2>Recent Scores</h2>
+                <div id="scoresContainer">
+                    <div id="scoresList" class="scores-list">
+                        {% if scores %}
+                            {% for index, score in enumerate(scores) %}
+                                <div class="score-item">
+                                    <div class="score-info">
+                                        <span class="game-name">{{ game_names.get(score.game, score.game) }}</span>
+                                        <span class="score-tries {% if not score.success %}failed{% endif %}">
+                                            {% if score.success %}
+                                                {{ score.tries }} tries
+                                            {% else %}
+                                                Failed
+                                            {% endif %}
+                                        </span>
+                                        <span class="score-date">{{ score.date }}</span>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('delete_score', index=index) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this score?')">
+                                        <button type="submit" class="delete-btn">🗑️</button>
+                                    </form>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">No scores recorded yet. Add your first score above!</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Minimal JavaScript for failed score functionality
+        function submitFailedScore() {
+            const game = document.getElementById('game').value;
+            const date = document.getElementById('date').value;
+            
+            if (!game || !date) {
+                alert('Please select a game and date first.');
+                return;
+            }
+            
+            // Set hidden field and submit form
+            document.getElementById('failed').value = 'true';
+            document.getElementById('tries').value = '';
+            document.getElementById('scoreForm').submit();
+        }
+        
+        // Form validation
+        document.getElementById('scoreForm').addEventListener('submit', function(e) {
+            const failed = document.getElementById('failed').value === 'true';
+            const tries = document.getElementById('tries').value;
+            
+            if (!failed && (!tries || tries < 1 || tries > 6)) {
+                if (!failed) {
+                    e.preventDefault();
+                    alert('Please enter a valid number of tries (1-6) or use the Failed button.');
+                    return;
+                }
+            }
+            
+            // Reset failed flag after submission
+            setTimeout(() => {
+                document.getElementById('failed').value = 'false';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
